@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimViveiro MT | Planner Técnico de Viveiro Florestal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SV</div>
+        <div>
+          <p class="eyebrow">Planner técnico</p>
+          <h1>SimViveiro MT</h1>
+        </div>
+      </div>
+
+      <nav class="nav-list" aria-label="Navegação do simulador">
+        <a href="#visao">Visão executiva</a>
+        <a href="#parametros">Parâmetros</a>
+        <a href="#fluxo">Fluxo produtivo</a>
+        <a href="#planta">Planta e capacidade</a>
+        <a href="#bioestatistica">Bioestatística</a>
+        <a href="#cronograma">Cronograma</a>
+        <a href="#exportacao">Exportação</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>Modelo estático</strong>
+          <p>Roda em navegador e GitHub Pages, sem servidor.</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="hero" id="visao">
+        <div class="hero-copy">
+          <p class="eyebrow">Viveiro Florestal | Cáceres - MT</p>
+          <h2>Simulador técnico-operacional para produção de mudas de <em>Eucalyptus urophylla</em> e <em>Tectona grandis</em>.</h2>
+          <p class="hero-text">Ajuste metas, perdas, tempos de permanência, área útil, capacidade de bancadas e canteiros. O painel recalcula gargalos, ocupação por fase, necessidade de material propagativo, mão de obra e risco estatístico de não atendimento da produção.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#parametros">Ajustar cenário</a>
+            <button class="button ghost" id="resetBtn">Restaurar padrão</button>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="panel-header">
+            <span>Cenário base</span>
+            <strong id="scenarioStatus">Viável com atenção</strong>
+          </div>
+          <div class="hero-kpis">
+            <div><small>Capacidade alvo</small><strong id="kpiTotalTarget">1.500.000</strong><span>mudas/ano</span></div>
+            <div><small>Gargalo crítico</small><strong id="kpiBottleneck">Casa de vegetação</strong><span id="kpiBottleneckOcc">96% ocup.</span></div>
+            <div><small>Prob. cumprir meta</small><strong id="kpiProb">--</strong><span>simulação Monte Carlo</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Indicadores principais">
+        <article class="metric-card">
+          <span class="metric-icon">EU</span>
+          <p>Eucalyptus clonal</p>
+          <strong id="metricEucTarget">1.000.000</strong>
+          <small>mudas expedidas/ano</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon teak">TG</span>
+          <p>Teca seminal</p>
+          <strong id="metricTeakTarget">500.000</strong>
+          <small>mudas expedidas/ano</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon water">H₂O</span>
+          <p>Demanda hídrica estimada</p>
+          <strong id="metricWater">--</strong>
+          <small>m³/dia no pico operacional</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon labor">RH</span>
+          <p>Equipe operacional</p>
+          <strong id="metricLabor">--</strong>
+          <small>colaboradores estimados</small>
+        </article>
+      </section>
+
+      <section class="section two-column" id="parametros">
+        <div class="section-copy">
+          <p class="eyebrow">01 | Planejamento</p>
+          <h3>Parâmetros produtivos ajustáveis</h3>
+          <p>Os controles abaixo funcionam como um “what-if” do viveiro. A lógica central é simples: a meta anual de expedição é convertida em demanda de material propagativo, bandejas, área simultânea e ocupação por fase. Quando a ocupação passa de 100%, o setor vira gargalo.</p>
+        </div>
+        <div class="controls-card">
+          <div class="control-group">
+            <h4>Metas e calendário</h4>
+            <label>Meta anual de Eucalyptus <output id="outEucTarget"></output><input type="range" min="300000" max="1800000" step="50000" data-key="eucTarget"></label>
+            <label>Meta anual de Teca <output id="outTeakTarget"></output><input type="range" min="100000" max="900000" step="25000" data-key="teakTarget"></label>
+            <label>Semanas operacionais/ano <output id="outWeeks"></output><input type="range" min="36" max="52" step="1" data-key="weeks"></label>
+            <label>Margem extra de produção <output id="outMargin"></output><input type="range" min="0" max="20" step="1" data-key="safetyMargin"></label>
+          </div>
+
+          <div class="control-group split">
+            <div>
+              <h4>Eucalyptus</h4>
+              <label>Perda no enraizamento <output id="outRootLoss"></output><input type="range" min="5" max="35" step="1" data-key="rootLoss"></label>
+              <label>Perdas pós-enraizamento <output id="outPostLoss"></output><input type="range" min="2" max="25" step="1" data-key="postLoss"></label>
+              <label>Células por bandeja <output id="outTrayCells"></output><input type="range" min="96" max="288" step="8" data-key="trayCells"></label>
+            </div>
+            <div>
+              <h4>Teca</h4>
+              <label>Germinação esperada <output id="outGermRate"></output><input type="range" min="35" max="90" step="1" data-key="germRate"></label>
+              <label>Perda na seleção/toco <output id="outTeakSelectLoss"></output><input type="range" min="2" max="30" step="1" data-key="teakSelectLoss"></label>
+              <label>Densidade útil no canteiro <output id="outTeakDensity"></output><input type="range" min="80" max="240" step="5" data-key="teakDensity"></label>
+            </div>
+          </div>
+
+          <div class="control-group split">
+            <div>
+              <h4>Tempos de permanência</h4>
+              <label>Casa de vegetação <output id="outRootWeeks"></output><input type="range" min="2" max="6" step="0.5" data-key="rootWeeks"></label>
+              <label>Casa de sombra <output id="outShadeWeeks"></output><input type="range" min="0.5" max="3" step="0.5" data-key="shadeWeeks"></label>
+              <label>Crescimento/rustificação <output id="outGrowthWeeks"></output><input type="range" min="4" max="12" step="0.5" data-key="growthWeeks"></label>
+            </div>
+            <div>
+              <h4>Infraestrutura existente</h4>
+              <label>Casa de vegetação <output id="outGreenhouseArea"></output><input type="range" min="120" max="500" step="10" data-key="greenhouseArea"></label>
+              <label>Casa de sombra <output id="outShadeArea"></output><input type="range" min="50" max="250" step="10" data-key="shadeArea"></label>
+              <label>Crescimento/rustificação <output id="outGrowthArea"></output><input type="range" min="200" max="900" step="25" data-key="growthArea"></label>
+            </div>
+          </div>
+
+          <div class="control-group split">
+            <div>
+              <h4>Canteiros de teca</h4>
+              <label>Número de canteiros <output id="outBeds"></output><input type="range" min="10" max="70" step="1" data-key="beds"></label>
+              <label>Comprimento do canteiro <output id="outBedLength"></output><input type="range" min="30" max="120" step="5" data-key="bedLength"></label>
+              <label>Largura do canteiro <output id="outBedWidth"></output><input type="range" min="0.8" max="1.6" step="0.1" data-key="bedWidth"></label>
+            </div>
+            <div>
+              <h4>Água e produtividade</h4>
+              <label>Lâmina diária de pico <output id="outWaterDepth"></output><input type="range" min="2" max="8" step="0.5" data-key="waterDepth"></label>
+              <label>Bandejas/m² em áreas protegidas <output id="outTrayDensityProtected"></output><input type="range" min="1.5" max="4" step="0.1" data-key="trayDensityProtected"></label>
+              <label>Bandejas/m² a pleno sol <output id="outTrayDensityGrowth"></output><input type="range" min="1.2" max="3.2" step="0.1" data-key="trayDensityGrowth"></label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="fluxo">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">02 | Fluxo produtivo</p>
+            <h3>Produção semanal, ocupação simultânea e pontos de estrangulamento</h3>
+          </div>
+          <span class="tag" id="flowTag">Atualizado em tempo real</span>
+        </div>
+        <div class="flow-grid">
+          <article class="flow-card euc">
+            <h4>Eucalyptus urophylla | miniestaquia</h4>
+            <div class="flow-line" id="eucFlow"></div>
+          </article>
+          <article class="flow-card teak-card">
+            <h4>Tectona grandis | produção seminal</h4>
+            <div class="flow-line" id="teakFlow"></div>
+          </article>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Indicador</th><th>Eucalyptus</th><th>Teca</th><th>Comentário técnico</th></tr></thead>
+            <tbody id="summaryTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="planta">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">03 | Planta técnica</p>
+            <h3>Planta conceitual com ocupação dinâmica por setor</h3>
+          </div>
+          <div class="legend"><span class="ok"></span> OK <span class="warn"></span> Atenção <span class="bad"></span> Gargalo</div>
+        </div>
+        <div class="layout-card">
+          <svg id="nurserySvg" viewBox="0 0 1100 680" role="img" aria-label="Planta baixa conceitual do viveiro"></svg>
+        </div>
+        <div class="capacity-grid" id="capacityCards"></div>
+      </section>
+
+      <section class="section two-column" id="bioestatistica">
+        <div class="section-copy">
+          <p class="eyebrow">04 | Bioestatística aplicada</p>
+          <h3>Controle de qualidade, amostragem e incerteza operacional</h3>
+          <p>O simulador usa conceitos básicos de bioestatística para transformar sobrevivência, germinação e perdas em risco produtivo. O módulo não substitui análise experimental, mas ajuda a justificar tecnicamente margem de segurança, monitoramento por lote e amostragem mínima.</p>
+          <div class="stat-note"><strong>Aplicação didática:</strong> intervalo de confiança para proporções, tamanho amostral e simulação Monte Carlo de 1.000 cenários.</div>
+        </div>
+        <div class="controls-card stats-card">
+          <div class="control-group split">
+            <div>
+              <h4>Amostragem</h4>
+              <label>Mudas avaliadas no lote <output id="outSampleN"></output><input type="range" min="30" max="1000" step="10" data-key="sampleN"></label>
+              <label>Sobrevivência observada <output id="outObservedSurvival"></output><input type="range" min="40" max="99" step="1" data-key="observedSurvival"></label>
+              <label>Erro amostral desejado <output id="outMarginError"></output><input type="range" min="2" max="12" step="0.5" data-key="marginError"></label>
+            </div>
+            <div>
+              <h4>Variabilidade simulada</h4>
+              <label>Desvio-padrão do enraizamento <output id="outSdRoot"></output><input type="range" min="1" max="12" step="0.5" data-key="sdRoot"></label>
+              <label>Desvio-padrão da germinação <output id="outSdGerm"></output><input type="range" min="1" max="18" step="0.5" data-key="sdGerm"></label>
+              <label>Desvio-padrão pós-manejo <output id="outSdPost"></output><input type="range" min="1" max="10" step="0.5" data-key="sdPost"></label>
+            </div>
+          </div>
+          <div class="stats-results" id="statsResults"></div>
+          <div class="mini-chart" id="monteChart" aria-label="Histograma da simulação"></div>
+        </div>
+      </section>
+
+      <section class="section" id="cronograma">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">05 | Cronograma</p>
+            <h3>Programação anual por etapa produtiva</h3>
+          </div>
+          <span class="tag">Escalonamento mensal</span>
+        </div>
+        <div class="gantt" id="ganttChart"></div>
+      </section>
+
+      <section class="section" id="exportacao">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">06 | Exportação</p>
+            <h3>Resumo executivo do cenário</h3>
+            <p>Use os botões para copiar os resultados para o relatório, salvar um cenário em JSON ou baixar uma tabela CSV.</p>
+          </div>
+          <div class="export-actions">
+            <button class="button primary" id="copySummaryBtn">Copiar resumo</button>
+            <button class="button ghost" id="downloadJsonBtn">Baixar JSON</button>
+            <button class="button ghost" id="downloadCsvBtn">Baixar CSV</button>
+          </div>
+        </div>
+        <pre id="executiveSummary" class="summary-box"></pre>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">Resumo copiado.</div>
+  <script src="app.js"></script>
+</body>
+</html>
